@@ -28,10 +28,16 @@ npm run dev        # open the playground (Vite dev server)
 | `npm run preview`     | Preview the production build                                |
 | `npm run typecheck`   | Type-check only, no emit                                    |
 
-## Usage (once published)
+# USAGE
+
+Install the package:
+
+```bash
+npm install spinner-games
+```
 
 The games are framework-agnostic custom elements. Import the package once to
-register the tags, then use them anywhere:
+register the tags, then for Angular, React, Vue and Web Components:
 
 ```js
 import 'spinner-games'

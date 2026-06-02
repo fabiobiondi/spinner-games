@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>spinner-games · playground</title>
     <style>
+      /* Smooth-scroll for in-page anchors (e.g. the hero "Play the games"
+         button jumping to #playground). Disabled automatically for users who
+         prefer reduced motion. */
+      html {
+        scroll-behavior: smooth;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
       body {
         margin: 0;
         min-height: 100vh;
@@ -52,6 +63,131 @@
       }
       .stage {
         text-align: center;
+      }
+
+      /* -------------------------------------------------------------------
+         Hero — the pitch at the top of the page. Sells the core idea:
+         drop the boring spinner and let users play a tiny game while they
+         wait. Theme-aware via the same --page-* variables; accent matches
+         the demos (--spinner-color / #2caac3).
+         ------------------------------------------------------------------- */
+      .hero {
+        --hero-accent: #2caac3;
+        width: 100%;
+        box-sizing: border-box;
+        padding: clamp(3rem, 9vw, 6.5rem) 1.5rem clamp(2rem, 5vw, 3.5rem);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      /* Soft radial glow behind the headline, tinted with the accent. */
+      .hero::before {
+        content: '';
+        position: absolute;
+        top: -35%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(900px, 130%);
+        height: 620px;
+        background: radial-gradient(
+          50% 50% at 50% 50%,
+          color-mix(in srgb, var(--hero-accent) 26%, transparent),
+          transparent 70%
+        );
+        pointer-events: none;
+        z-index: 0;
+      }
+      .hero-inner {
+        position: relative;
+        z-index: 1;
+        max-width: 820px;
+        margin: 0 auto;
+      }
+      .hero-eyebrow {
+        margin: 0 0 1.25rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        opacity: 0.55;
+        font-weight: 600;
+      }
+      .hero-title {
+        margin: 0;
+        font-size: clamp(2.2rem, 6.5vw, 4rem);
+        line-height: 1.05;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      /* "spinners" gets struck through with an accent slash — the visual gag
+         of the whole library: cross out the old spinner. */
+      .hero-strike {
+        position: relative;
+        white-space: nowrap;
+        color: color-mix(in srgb, var(--page-fg) 65%, transparent);
+      }
+      .hero-strike::after {
+        content: '';
+        position: absolute;
+        left: -2%;
+        right: -2%;
+        top: 52%;
+        height: 0.11em;
+        background: var(--hero-accent);
+        transform: rotate(-3deg);
+        border-radius: 2px;
+      }
+      .hero-lead {
+        margin: 1.5rem auto 0;
+        font-size: clamp(1.05rem, 2.6vw, 1.4rem);
+        font-weight: 500;
+        opacity: 0.75;
+      }
+      .hero-pitch {
+        margin: 1rem auto 0;
+        max-width: 620px;
+        font-size: clamp(1rem, 2.2vw, 1.2rem);
+        line-height: 1.6;
+        opacity: 0.7;
+      }
+      .hero-accent {
+        color: var(--hero-accent);
+        font-weight: 700;
+      }
+      .hero-actions {
+        margin-top: 2.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+      }
+      .hero-cta {
+        font: inherit;
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: 0.04em;
+        text-decoration: none;
+        border-radius: 10px;
+        padding: 0.9rem 2.2rem;
+        cursor: pointer;
+        transition: transform 0.1s, filter 0.15s, background 0.15s;
+      }
+      .hero-cta--primary {
+        color: #0e0e12;
+        background: var(--hero-accent);
+      }
+      .hero-cta--primary:hover {
+        filter: brightness(1.1);
+      }
+      .hero-cta--ghost {
+        color: var(--page-fg);
+        background: transparent;
+        border: 1px solid var(--page-border-strong);
+      }
+      .hero-cta--ghost:hover {
+        background: rgba(127, 127, 127, 0.12);
+      }
+      .hero-cta:active {
+        transform: translateY(1px);
       }
       .games-grid {
         --spinner-color: #2caac3;
@@ -400,6 +536,103 @@
         overflow: auto;
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       }
+      /* Theming callout: a clear, framework-agnostic explanation of how to
+         recolor the games via the --spinner-color CSS variable, with a live
+         swatch picker so you can see it happen. */
+      .api-theming {
+        margin: 2.5rem auto 0;
+        max-width: 760px;
+        text-align: left;
+        border: 1px solid var(--page-border);
+        border-radius: 12px;
+        padding: 1.5rem 1.5rem 1.75rem;
+      }
+      .api-theming-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+      .api-theming-sub {
+        margin: 0.5rem 0 1.25rem;
+        font-size: 0.85rem;
+        line-height: 1.6;
+        opacity: 0.7;
+      }
+      .api-theming-sub code,
+      .api-theming p code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.82em;
+        background: rgba(127, 127, 127, 0.14);
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
+      }
+      /* Live demo: a real game + a row of color swatches that set the variable
+         on it, so the effect is visible before you read a line of code. */
+      .theming-demo {
+        display: grid;
+        grid-template-columns: minmax(0, 200px) 1fr;
+        gap: 1.25rem;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+      @media (max-width: 560px) {
+        .theming-demo {
+          grid-template-columns: 1fr;
+        }
+      }
+      .theming-demo spinner-bubbles {
+        width: 100%;
+      }
+      .theming-swatches {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        align-items: center;
+      }
+      .theming-swatch {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        border: 2px solid var(--page-border-strong);
+        padding: 0;
+        cursor: pointer;
+        transition: transform 0.1s, box-shadow 0.15s;
+      }
+      .theming-swatch:hover {
+        transform: scale(1.1);
+      }
+      .theming-swatch[aria-pressed='true'] {
+        box-shadow: 0 0 0 2px var(--page-bg), 0 0 0 4px currentColor;
+      }
+      .theming-swatch--custom {
+        background: transparent;
+        width: 2.2rem;
+        height: 2rem;
+        border-radius: 6px;
+      }
+      .api-theming-label {
+        margin: 0 0 0.4rem;
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.55;
+      }
+      .theming-code {
+        margin: 0;
+        padding: 0.9rem 1rem;
+        background: rgba(127, 127, 127, 0.08);
+        border: 1px solid var(--page-border);
+        border-radius: 10px;
+        white-space: pre;
+        overflow: auto;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.8rem;
+        line-height: 1.55;
+      }
+      .theming-code + .theming-code {
+        margin-top: 0.9rem;
+      }
       .api-note {
         margin: 1.25rem 0 0;
         font-size: 0.75rem;
@@ -416,7 +649,25 @@
     <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">
       ☀ Light
     </button>
-    <div class="stage">
+    <header class="hero">
+      <div class="hero-inner">
+        <p class="hero-eyebrow">spinner-games</p>
+        <h1 class="hero-title">
+          Still stuck with boring <span class="hero-strike">spinners</span>?
+        </h1>
+        <p class="hero-lead">Long loading times wearing your users' patience thin?</p>
+        <p class="hero-pitch">
+          Turn dead waiting time into <span class="hero-accent">playtime</span> —
+          drop in a tiny playable game and keep your users entertained while
+          they wait.
+        </p>
+        <div class="hero-actions">
+          <a class="hero-cta hero-cta--primary" href="#playground">▶ Play the games</a>
+          <a class="hero-cta hero-cta--ghost" href="#api-explorer">Get the code</a>
+        </div>
+      </div>
+    </header>
+    <div class="stage" id="playground">
       <h1>spinner-games playground</h1>
       <div class="global-controls">
         <div class="controls-row">
@@ -426,7 +677,7 @@
           </label>
         </div>
         <div class="play-row">
-          <button id="play-btn" class="play-btn" type="button">▶ Play</button>
+          <button id="play-btn" class="play-btn" type="button">▶ Play Mode</button>
           <button id="automode-btn" class="play-btn" type="button">↻ Automode</button>
         </div>
         <div class="controls-row">
@@ -519,6 +770,43 @@
             </div>
           </div>
         </div>
+        <!-- Theming callout: how to recolor the games. Color isn't a prop —
+             it's a CSS custom property, so it works identically in every
+             framework. The swatches below set it live on a real game. -->
+        <div class="api-theming" id="theming">
+          <h3 class="api-theming-title">🎨 Change the color</h3>
+          <p class="api-theming-sub">
+            Color isn't a prop — every game reads the
+            <code>--spinner-color</code> CSS custom property. Set it on the
+            element (or any ancestor) and it cascades in. Because it's plain
+            CSS, it works the same in <strong>HTML, React, Vue and Angular</strong>.
+            Try the swatches:
+          </p>
+
+          <div class="theming-demo">
+            <spinner-bubbles id="theming-game" autoplay showNewLine="12"></spinner-bubbles>
+            <div>
+              <p class="api-theming-label">Pick a color</p>
+              <div class="theming-swatches" id="theming-swatches" role="group" aria-label="Game color">
+                <button class="theming-swatch" type="button" style="background:#2caac3;color:#2caac3" data-color="#2caac3" aria-pressed="true" title="#2caac3"></button>
+                <button class="theming-swatch" type="button" style="background:#4ade80;color:#4ade80" data-color="#4ade80" aria-pressed="false" title="#4ade80"></button>
+                <button class="theming-swatch" type="button" style="background:#f59e0b;color:#f59e0b" data-color="#f59e0b" aria-pressed="false" title="#f59e0b"></button>
+                <button class="theming-swatch" type="button" style="background:#e879f9;color:#e879f9" data-color="#e879f9" aria-pressed="false" title="#e879f9"></button>
+                <button class="theming-swatch" type="button" style="background:#f43f5e;color:#f43f5e" data-color="#f43f5e" aria-pressed="false" title="#f43f5e"></button>
+                <input class="theming-swatch theming-swatch--custom" type="color" id="theming-custom" value="#2caac3" title="Custom color" />
+              </div>
+            </div>
+          </div>
+
+          <p class="api-theming-label">In a stylesheet — recolors every game on the page</p>
+          <pre class="theming-code"><code>spinner-bubbles {
+  --spinner-color: <span id="theming-css">#2caac3</span>;
+}</code></pre>
+
+          <p class="api-theming-label" style="margin-top:1rem">Or inline, on a single instance</p>
+          <pre class="theming-code"><code>&lt;spinner-bubbles style="--spinner-color: <span id="theming-inline">#2caac3</span>"&gt;&lt;/spinner-bubbles&gt;</code></pre>
+        </div>
+
         <p class="api-note">
           Every game is themeable with the <code>--spinner-color</code> CSS
           variable and sizes itself to its container — see
@@ -644,6 +932,32 @@
           )
         })
       })
+
+      // Theming callout: clicking a swatch (or picking a custom color) sets
+      // --spinner-color on the demo game and mirrors the value into the two
+      // code snippets, so the docs always show exactly what you just saw.
+      const themingGame = document.getElementById('theming-game')
+      const themingSwatches = document.querySelectorAll('#theming-swatches .theming-swatch[data-color]')
+      const themingCustom = document.getElementById('theming-custom')
+      const themingCssOut = document.getElementById('theming-css')
+      const themingInlineOut = document.getElementById('theming-inline')
+      const applyThemingColor = (color, source) => {
+        themingGame.style.setProperty('--spinner-color', color)
+        themingCssOut.textContent = color
+        themingInlineOut.textContent = color
+        // Highlight the matching preset swatch (none, if it's a custom color).
+        themingSwatches.forEach((b) =>
+          b.setAttribute('aria-pressed', String(b.dataset.color === color))
+        )
+        // Keep the custom picker in step unless it was the source of the change.
+        if (source !== 'custom') themingCustom.value = color
+      }
+      themingSwatches.forEach((btn) => {
+        btn.addEventListener('click', () => applyThemingColor(btn.dataset.color, 'preset'))
+      })
+      themingCustom.addEventListener('input', () =>
+        applyThemingColor(themingCustom.value, 'custom')
+      )
     </script>
   </body>
 </html>

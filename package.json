@@ -40,6 +40,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "sideEffects": true,
   "scripts": {
     "dev": "vite",
@@ -49,7 +52,13 @@
     "build:angular": "ng-packagr -p wrappers/angular/ng-package.json -c wrappers/angular/tsconfig.lib.json",
     "build:site": "vite build --config vite.config.site.ts",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit && tsc -p tsconfig.wrappers.json --noEmit"
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.wrappers.json --noEmit",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run typecheck && npm run build",
+    "publish:dry": "npm publish --dry-run",
+    "release:patch": "npm version patch && npm publish && git push --follow-tags",
+    "release:minor": "npm version minor && npm publish && git push --follow-tags",
+    "release:major": "npm version major && npm publish && git push --follow-tags"
   },
   "dependencies": {
     "@lit/react": "^1.0.8",
