@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spinner-games · playground</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: start center;
+        /* Background and text colour are driven by variables so the theme
+           toggle (top-right) can swap the whole page dark <-> light. */
+        --page-bg: #0e0e12;
+        --page-fg: #eee;
+        /* Border shades also follow the theme: subtle for card outlines,
+           strong for control chrome (pickers, segmented controls). */
+        --page-border: #222;
+        --page-border-strong: #444;
+        background: var(--page-bg);
+        color: var(--page-fg);
+        font-family: system-ui, sans-serif;
+        transition: background 0.2s ease, color 0.2s ease;
+      }
+      body[data-theme='light'] {
+        --page-bg: #f5f5f7;
+        --page-fg: #1a1a1f;
+        --page-border: #d7d7dd;
+        --page-border-strong: #b8b8c2;
+      }
+      /* Theme toggle: fixed to the top-right corner of the viewport. */
+      .theme-toggle {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 10;
+        font: inherit;
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--page-fg);
+        background: rgba(127, 127, 127, 0.12);
+        border: 1px solid var(--page-border-strong);
+        border-radius: 6px;
+        padding: 0.4rem 0.8rem;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+      }
+      .theme-toggle:hover {
+        background: rgba(127, 127, 127, 0.24);
+      }
+      .stage {
+        text-align: center;
+      }
+      .games-grid {
+        --spinner-color: #2caac3;
+        margin: 2rem auto 0;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+        width: min(95vw, 1100px);
+      }
+      .game-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: center;
+        border: 1px solid var(--page-border);
+        border-radius: 12px;
+        padding: 1rem;
+        /* per-game resize handle (drag the bottom-right corner) */
+        justify-self: center;
+        /* Size control (Small/Medium/Large) drives this; Large = 520px default */
+        width: min(100%, var(--card-size, 520px));
+        resize: horizontal;
+        overflow: hidden;
+      }
+      .game-card h2 {
+        margin: 0 0 0.75rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+      }
+      .game-card spinner-pong,
+      .game-card spinner-breakout,
+      .game-card spinner-bubbles,
+      .game-card spinner-flappy {
+        width: 100%;
+      }
+      /* Smaller card sizes pack 4 across; only above the mobile breakpoint so
+         very narrow viewports still collapse to a single column below. */
+      @media (min-width: 541px) {
+        .games-grid[data-size='xsmall'],
+        .games-grid[data-size='small'] {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 540px) {
+        .games-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .stage h1 {
+        font-weight: 500;
+        opacity: 0.6;
+        font-size: 0.9rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .pong-box,
+      .breakout-box,
+      .bubbles-box,
+      .flappy-box {
+        --spinner-color: #2caac3;
+        margin-top: 1.5rem;
+        width: min(90vw, 480px);
+        /* resize handle to test responsiveness */
+        resize: horizontal;
+        overflow: hidden;
+        border: 1px solid var(--page-border);
+        padding: 8px;
+      }
+      .bubbles-box {
+        width: min(80vw, 320px);
+      }
+      .control {
+        margin-top: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.7;
+      }
+      .control span {
+        font-variant-numeric: tabular-nums;
+        min-width: 2.5em;
+        text-align: left;
+      }
+      .global-controls {
+        margin: 1.5rem auto 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        width: min(95vw, 1100px);
+      }
+      /* Each row of global controls wraps independently and stays centered. */
+      .controls-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+      }
+      .global-controls input[type='color'] {
+        width: 2.2rem;
+        height: 1.6rem;
+        padding: 0;
+        border: 1px solid var(--page-border-strong);
+        border-radius: 4px;
+        background: transparent;
+        cursor: pointer;
+      }
+      .seg {
+        display: inline-flex;
+        border: 1px solid var(--page-border-strong);
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      .seg button {
+        font: inherit;
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--page-fg);
+        background: transparent;
+        border: 0;
+        padding: 0.35rem 0.8rem;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+      }
+      .seg button + button {
+        border-left: 1px solid var(--page-border-strong);
+      }
+      .seg button[aria-pressed='true'] {
+        background: var(--spinner-color, #2caac3);
+        color: #0e0e12;
+      }
+      /* The PLAY / AUTOMODE pair sits above the option row, joined into a
+         single tabbar-style control: no gap between them, and one shared
+         rounded shell (overflow:hidden clips the inner corners square). */
+      .play-row {
+        margin-top: 0.5rem;
+        display: inline-flex;
+        align-items: stretch;
+        justify-content: center;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      /* Thin seam between the two halves so the tabbar still reads as two
+         buttons even though they touch. */
+      .play-row .play-btn + .play-btn {
+        border-left: 1px solid rgba(14, 14, 18, 0.25);
+      }
+      /* Big PLAY / AUTOMODE buttons. PLAY leaves demo (automode) and hands the
+         games to the player; AUTOMODE puts them back into the self-running demo. */
+      .play-btn {
+        font: inherit;
+        font-weight: 700;
+        font-size: 1.1rem;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: #0e0e12;
+        background: var(--spinner-color, #2caac3);
+        border: 0;
+        /* No own rounding — the .play-row shell rounds the outer corners and
+           keeps the touching (inner) corners square. */
+        border-radius: 0;
+        padding: 0.85rem 3.5rem;
+        cursor: pointer;
+        transition: transform 0.1s, opacity 0.15s, filter 0.15s;
+      }
+      .play-btn:hover {
+        filter: brightness(1.1);
+      }
+      .play-btn:active {
+        transform: translateY(1px);
+      }
+      /* Once you're already playing (automode off) the button has nothing left
+         to do — dim it and block clicks. */
+      .play-btn:disabled {
+        opacity: 0.4;
+        cursor: default;
+        filter: none;
+      }
+
+      /* -------------------------------------------------------------------
+         API explorer — sits below the demos. Pick a game and a framework,
+         tweak the props, and read the copy-ready snippet (highlighted with
+         Shiki). The whole block is playground-only; see
+         /playground/api-explorer.js for the wiring.
+         ------------------------------------------------------------------- */
+      .api-explorer {
+        /* Accent matches the grid so the live preview reads as the same family. */
+        --spinner-color: #2caac3;
+        margin: 3.5rem auto 4rem;
+        width: min(95vw, 1100px);
+        text-align: center;
+        border-top: 1px solid var(--page-border);
+        padding-top: 2.5rem;
+      }
+      .api-title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+      }
+      .api-sub {
+        margin: 0.4rem 0 1.5rem;
+        font-size: 0.85rem;
+        opacity: 0.6;
+      }
+      /* The two segmented controls (game + framework) share a centered row. */
+      .api-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem 1.5rem;
+      }
+      .api-tab-label {
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.55;
+        margin-right: 0.5rem;
+      }
+      /* Left = live preview + prop controls; right = the code panels. Collapses
+         to a single column on narrow viewports. */
+      .api-body {
+        margin-top: 1.75rem;
+        display: grid;
+        grid-template-columns: minmax(240px, 340px) 1fr;
+        gap: 1.5rem;
+        align-items: start;
+        text-align: left;
+      }
+      @media (max-width: 760px) {
+        .api-body {
+          grid-template-columns: 1fr;
+        }
+      }
+      .api-left,
+      .api-right {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        min-width: 0; /* let the code panel shrink instead of overflowing the grid */
+      }
+      .api-preview {
+        border: 1px solid var(--page-border);
+        border-radius: 12px;
+        padding: 1rem;
+        display: grid;
+        place-items: center;
+      }
+      .api-preview > * {
+        width: 100%;
+      }
+      /* One row per prop: the prop name (monospace — it doubles as the API
+         label) on the left, its control on the right. */
+      .api-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+        font-size: 0.8rem;
+      }
+      .api-row {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        justify-content: space-between;
+      }
+      .api-name {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        opacity: 0.9;
+      }
+      .api-default {
+        opacity: 0.4;
+        font-size: 0.7rem;
+        margin-left: 0.4rem;
+      }
+      .api-num {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .api-num span {
+        font-variant-numeric: tabular-nums;
+        min-width: 2.6em;
+        text-align: right;
+        opacity: 0.7;
+      }
+      .api-code-block {
+        border: 1px solid var(--page-border);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .api-code-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.45rem 0.8rem;
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.7;
+        border-bottom: 1px solid var(--page-border);
+      }
+      .api-copy {
+        font: inherit;
+        font-size: 0.65rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--page-fg);
+        background: rgba(127, 127, 127, 0.12);
+        border: 1px solid var(--page-border-strong);
+        border-radius: 5px;
+        padding: 0.2rem 0.55rem;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .api-copy:hover {
+        background: rgba(127, 127, 127, 0.24);
+      }
+      .api-code {
+        font-size: 0.8rem;
+        overflow: auto;
+      }
+      /* Shiki emits its own <pre class="shiki"> with a theme background; we only
+         add the padding and keep long lines scrollable. */
+      .api-code pre {
+        margin: 0;
+        padding: 0.9rem 1rem;
+        overflow: auto;
+      }
+      .api-code pre code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      /* Plain-text fallback shown if Shiki can't load (e.g. offline). */
+      .api-fallback {
+        margin: 0;
+        padding: 0.9rem 1rem;
+        background: rgba(127, 127, 127, 0.08);
+        white-space: pre;
+        overflow: auto;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      .api-note {
+        margin: 1.25rem 0 0;
+        font-size: 0.75rem;
+        opacity: 0.55;
+        text-align: center;
+      }
+      .api-note code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        opacity: 0.85;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">
+      ☀ Light
+    </button>
+    <div class="stage">
+      <h1>spinner-games playground</h1>
+      <div class="global-controls">
+        <div class="controls-row">
+          <label class="control">
+            Color
+            <input id="color-picker" type="color" value="#2caac3" />
+          </label>
+        </div>
+        <div class="play-row">
+          <button id="play-btn" class="play-btn" type="button">▶ Play</button>
+          <button id="automode-btn" class="play-btn" type="button">↻ Automode</button>
+        </div>
+        <div class="controls-row">
+          <label class="control">
+            <input id="outside-mouse" type="checkbox" checked />
+            Enable Mouse Outside Game
+          </label>
+          <label class="control">
+            <input id="show-background" type="checkbox" checked />
+            Show background
+          </label>
+          <div class="control">
+            Size
+            <span class="seg" id="size-control" role="group" aria-label="Size">
+              <button type="button" data-value="156" data-size="xsmall" aria-pressed="false">XSmall</button>
+              <button type="button" data-value="260" data-size="small" aria-pressed="true">Small</button>
+              <button type="button" data-value="390" data-size="medium" aria-pressed="false">Medium</button>
+              <button type="button" data-value="520" data-size="large" aria-pressed="false">Large</button>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="games-grid">
+        <div class="game-card">
+          <h2>Pong</h2>
+          <spinner-pong id="pong"></spinner-pong>
+          <label class="control">
+            CPU skill
+            <input id="difficulty" type="range" min="0" max="1" step="0.05" value="0.6" />
+            <span id="difficulty-val">0.60</span>
+          </label>
+        </div>
+        <div class="game-card">
+          <h2>Breakout</h2>
+          <spinner-breakout></spinner-breakout>
+        </div>
+        <div class="game-card">
+          <h2>Bubbles</h2>
+          <spinner-bubbles showNewLine="15"></spinner-bubbles>
+        </div>
+        <div class="game-card">
+          <h2>Flappy</h2>
+          <spinner-flappy id="flappy"></spinner-flappy>
+          <div class="control">
+            Obstacles
+            <span class="seg" id="flappy-obstacles" role="group" aria-label="Obstacles">
+              <button type="button" data-value="walls" aria-pressed="true">Walls</button>
+              <button type="button" data-value="cave" aria-pressed="false">Cave</button>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- API explorer: pick a game + framework, tweak props, copy the snippet.
+           Tabs, controls and code are built in /playground/api-explorer.js. -->
+      <section class="api-explorer" id="api-explorer">
+        <h2 class="api-title">Use it anywhere</h2>
+        <p class="api-sub">
+          Pick a game and your framework, tweak the props, and copy the snippet.
+        </p>
+        <div class="api-tabs">
+          <span class="api-group">
+            <span class="api-tab-label">Game</span>
+            <span class="seg" id="api-game" role="group" aria-label="Game"></span>
+          </span>
+          <span class="api-group">
+            <span class="api-tab-label">Framework</span>
+            <span class="seg" id="api-framework" role="group" aria-label="Framework"></span>
+          </span>
+        </div>
+        <div class="api-body">
+          <div class="api-left">
+            <div class="api-preview" id="api-preview"></div>
+            <div class="api-controls" id="api-controls"></div>
+          </div>
+          <div class="api-right">
+            <div class="api-code-block">
+              <div class="api-code-head">
+                <span>Install</span>
+                <button class="api-copy" type="button" data-copy="install">Copy</button>
+              </div>
+              <div class="api-code" id="api-install"></div>
+            </div>
+            <div class="api-code-block">
+              <div class="api-code-head">
+                <span id="api-use-label">Use</span>
+                <button class="api-copy" type="button" data-copy="use">Copy</button>
+              </div>
+              <div class="api-code" id="api-use"></div>
+            </div>
+          </div>
+        </div>
+        <p class="api-note">
+          Every game is themeable with the <code>--spinner-color</code> CSS
+          variable and sizes itself to its container — see
+          <code>docs/</code> for the full reference.
+        </p>
+      </section>
+    </div>
+    <script type="module" src="/src/index.ts"></script>
+    <script type="module" src="/playground/api-explorer.js"></script>
+    <script type="module">
+      // Theme toggle (top-right): swaps only the page background between dark
+      // and light via the body[data-theme] attribute. Starts in dark.
+      const themeToggle = document.getElementById('theme-toggle')
+      themeToggle.addEventListener('click', () => {
+        const light = document.body.dataset.theme !== 'light'
+        document.body.dataset.theme = light ? 'light' : 'dark'
+        themeToggle.setAttribute('aria-pressed', String(light))
+        themeToggle.textContent = light ? '🌙 Dark' : '☀ Light'
+      })
+
+      const pong = document.getElementById('pong')
+      const slider = document.getElementById('difficulty')
+      const label = document.getElementById('difficulty-val')
+      const sync = () => {
+        const v = Number(slider.value)
+        pong.difficulty = v
+        label.textContent = v.toFixed(2)
+      }
+      slider.addEventListener('input', sync)
+      sync()
+
+      const flappy = document.getElementById('flappy')
+      const obstacleBtns = document.querySelectorAll('#flappy-obstacles button')
+      obstacleBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          flappy.obstacles = btn.dataset.value
+          // highlight the active obstacle mode
+          obstacleBtns.forEach((b) =>
+            b.setAttribute('aria-pressed', String(b === btn))
+          )
+        })
+      })
+
+      // Global controls (above the grid) — drive all four grid games at once.
+      const grid = document.querySelector('.games-grid')
+      const gridGames = grid.querySelectorAll(
+        'spinner-pong, spinner-breakout, spinner-bubbles, spinner-flappy'
+      )
+
+      // 1) Color: a single CSS variable on the grid cascades into every game.
+      const colorPicker = document.getElementById('color-picker')
+      const playRow = document.querySelector('.play-row')
+      colorPicker.addEventListener('input', () => {
+        grid.style.setProperty('--spinner-color', colorPicker.value)
+        // Keep the PLAY / AUTOMODE buttons' accent in step (they live outside
+        // the grid, so the grid's variable doesn't cascade to them).
+        playRow.style.setProperty('--spinner-color', colorPicker.value)
+      })
+
+      // 2) Enable Mouse Outside Game: flip allowOutsideControls on every game.
+      const outsideMouse = document.getElementById('outside-mouse')
+      const syncOutsideMouse = () => {
+        for (const g of gridGames) g.allowOutsideControls = outsideMouse.checked
+      }
+      outsideMouse.addEventListener('change', syncOutsideMouse)
+      syncOutsideMouse()
+
+      // 3) Automode: on → all games run themselves (demo); off → back to play.
+      // The old checkbox was removed — the big PLAY / AUTOMODE buttons are now
+      // the only control, so the on/off state lives in this variable. Starts on.
+      const playBtn = document.getElementById('play-btn')
+      const autoModeBtn = document.getElementById('automode-btn')
+      let automodeOn = true
+      const syncAutomode = () => {
+        for (const g of gridGames) g.autoplay = automodeOn
+        // Each big button is only actionable when its mode isn't active yet:
+        // PLAY while we're still in demo, AUTOMODE while we're playing.
+        playBtn.disabled = !automodeOn
+        autoModeBtn.disabled = automodeOn
+      }
+      syncAutomode()
+
+      // Big PLAY / AUTOMODE buttons: flip demo mode on or off. They're the
+      // inverse of each other.
+      playBtn.addEventListener('click', () => {
+        automodeOn = false
+        syncAutomode()
+      })
+      autoModeBtn.addEventListener('click', () => {
+        automodeOn = true
+        syncAutomode()
+      })
+
+      // 4) Show background: flip showBackground on every game — off makes the
+      // games float transparently over the page.
+      const showBackground = document.getElementById('show-background')
+      const syncBackground = () => {
+        for (const g of gridGames) g.showBackground = showBackground.checked
+      }
+      showBackground.addEventListener('change', syncBackground)
+      syncBackground()
+
+      // 5) Size: one CSS variable on the grid sets each card's width.
+      // Large = 520px (current default), Medium = 390px, Small = 260px (half),
+      // XSmall = 156px (40% smaller than Small).
+      const sizeBtns = document.querySelectorAll('#size-control button')
+      // Reflect the initial (pressed) size so both the 4-column rule and the
+      // card width match the default selection on load (not just on click).
+      const initialSize = document.querySelector(
+        '#size-control button[aria-pressed="true"]'
+      )
+      grid.dataset.size = initialSize?.dataset.size ?? 'large'
+      if (initialSize)
+        grid.style.setProperty('--card-size', initialSize.dataset.value + 'px')
+      sizeBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          grid.style.setProperty('--card-size', btn.dataset.value + 'px')
+          // xsmall/small pack 4 across (handled in CSS via this attribute)
+          grid.dataset.size = btn.dataset.size
+          // highlight the active size
+          sizeBtns.forEach((b) =>
+            b.setAttribute('aria-pressed', String(b === btn))
+          )
+        })
+      })
+    </script>
+  </body>
+</html>

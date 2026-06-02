@@ -1,0 +1,11 @@
+{
+  "name": "spinner-games-angular",
+  "version": "0.0.1",
+  "description": "Angular standalone-directive wrappers for the spinner-games web components.",
+  "license": "MIT",
+  "peerDependencies": {
+    "@angular/core": ">=17.1.0",
+    "spinner-games": "^0.0.1"
+  },
+  "sideEffects": true
+}

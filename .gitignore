@@ -1,0 +1,12 @@
+# Dependencies & build output
+node_modules/
+dist/
+
+# Editor / OS
+.DS_Store
+
+# PromptOps context snapshot
+.promptops/
+
+# PromptOps session assets
+.promptops-assets/

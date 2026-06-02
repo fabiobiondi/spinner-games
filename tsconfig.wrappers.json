@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": false,
+    "paths": {
+      "spinner-games": ["./src/index.ts"]
+    }
+  },
+  "include": ["wrappers/react", "wrappers/vue"]
+}
