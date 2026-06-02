@@ -15,24 +15,7 @@ TypeScript + Vite, shippable as a standalone library.
 Playable mini-games (`<spinner-pong>`, `<spinner-breakout>`,
 `<spinner-bubbles>`, `<spinner-flappy>`) are in place, usable as interactive
 loaders or self-running demos.
-
-## Getting started
-
-```bash
-npm install
-npm run dev        # open the playground (Vite dev server)
-```
-
-## Scripts
-
-| Script                | What it does                                                |
-| --------------------- | ---------------------------------------------------------- |
-| `npm run dev`         | Dev server + playground (`index.html`)                     |
-| `npm run build`       | Build everything: core + React/Vue + Angular into `dist/`  |
-| `npm run build:lib`   | Build core web components + React/Vue wrappers (Vite + tsc) |
-| `npm run build:angular` | Build the Angular wrappers (ng-packagr, partial-Ivy)     |
-| `npm run preview`     | Preview the production build                                |
-| `npm run typecheck`   | Type-check only, no emit                                    |
+                |
 
 # USAGE
 
@@ -200,6 +183,26 @@ the playable and `autoplay` modes:
 <spinner-flappy obstacles="cave"></spinner-flappy>
 <spinner-flappy autoplay obstacles="cave"></spinner-flappy>
 ```
+
+
+## Contributions
+
+```bash
+npm install
+npm run dev        # open the playground (Vite dev server)
+```
+
+## Scripts
+
+| Script                | What it does                                                |
+| --------------------- | ---------------------------------------------------------- |
+| `npm run dev`         | Dev server + playground (`index.html`)                     |
+| `npm run build`       | Build everything: core + React/Vue + Angular into `dist/`  |
+| `npm run build:lib`   | Build core web components + React/Vue wrappers (Vite + tsc) |
+| `npm run build:angular` | Build the Angular wrappers (ng-packagr, partial-Ivy)     |
+| `npm run preview`     | Preview the production build                                |
+| `npm run typecheck`   | Type-check only, no emit                    
+
 
 ## Adding a game
 
