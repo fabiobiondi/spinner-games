@@ -5,6 +5,14 @@
   "type": "module",
   "license": "MIT",
   "author": "Fabio Biondi <fbiondi77@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabiobiondi/spinner-games.git"
+  },
+  "homepage": "https://github.com/fabiobiondi/spinner-games#readme",
+  "bugs": {
+    "url": "https://github.com/fabiobiondi/spinner-games/issues"
+  },
   "keywords": [
     "web-components",
     "lit",

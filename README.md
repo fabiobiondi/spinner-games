@@ -1,6 +1,10 @@
 # spinner-games
 
-![spinner-games preview — Pong, Breakout, Bubbles and Flappy mini-games](docs/screenshot.png)
+[![npm version](https://img.shields.io/npm/v/spinner-games.svg)](https://www.npmjs.com/package/spinner-games)
+[![npm downloads](https://img.shields.io/npm/dm/spinner-games.svg)](https://www.npmjs.com/package/spinner-games)
+[![license](https://img.shields.io/npm/l/spinner-games.svg)](https://github.com/fabiobiondi/spinner-games/blob/main/LICENSE)
+
+![spinner-games preview — Pong, Breakout, Bubbles and Flappy mini-games](https://raw.githubusercontent.com/fabiobiondi/spinner-games/main/docs/screenshot.png)
 
 Tiny, playable **web-component games** you can drop in as loaders/spinners
 instead of the classic spinning circle. Built with [Lit](https://lit.dev) +
@@ -151,6 +155,33 @@ opt-in attributes are common to the playable games (`<spinner-pong>`,
 <spinner-breakout autoplay></spinner-breakout>
 <spinner-pong autoplay></spinner-pong>
 ```
+
+### Color
+
+Color isn't an attribute or prop — every game reads the `--spinner-color` CSS
+custom property. Set it **inline**, in a **stylesheet**, or on any **ancestor**
+(it cascades), and it works identically in HTML, React, Vue and Angular:
+
+```html
+<!-- inline, on a single instance -->
+<spinner-pong autoplay style="--spinner-color: #4ade80"></spinner-pong>
+```
+
+```css
+/* in a stylesheet — recolors every game on the page */
+spinner-pong {
+  --spinner-color: #4ade80; /* green */
+}
+
+/* …or set it once on a parent and it cascades into every game inside */
+.loaders {
+  --spinner-color: #e879f9;
+}
+```
+
+The panel background is a faint tint of this color; override it on its own with
+`--spinner-bg`. See each framework's guide in [`docs/`](docs/) for idiomatic
+snippets (e.g. React needs a `React.CSSProperties` cast for the inline form).
 
 `<spinner-bubbles>` also takes `showNewLine="<seconds>"` — every that-many
 seconds a new row of bubbles drops in from the top and the stack slides down,
