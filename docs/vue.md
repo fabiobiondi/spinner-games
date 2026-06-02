@@ -95,14 +95,51 @@ in templates too.
 
 ## Styling
 
-Style the tag with CSS custom properties (see
-[web components → Styling](./web-components.md#styling)) and size it via its
-container:
+### Change the color
+
+Color isn't a prop — every game reads the `--spinner-color` CSS custom
+property. Set it **inline** on the component:
+
+```vue
+<template>
+  <Bubbles autoplay style="--spinner-color: #4ade80" />
+</template>
+```
+
+…or in a `<style>` block / stylesheet, which recolors every instance:
+
+```vue
+<style scoped>
+/* the wrappers render the underlying custom-element tags */
+spinner-bubbles {
+  --spinner-color: #4ade80; /* green */
+}
+</style>
+```
+
+Because it's a CSS custom property it **cascades**, so setting it once on any
+ancestor themes everything inside:
+
+```vue
+<template>
+  <div style="--spinner-color: #e879f9">
+    <Pong autoplay />
+    <Bubbles autoplay />
+  </div>
+</template>
+```
+
+### Size
+
+Each game fills its container, so size it by constraining the parent:
 
 ```vue
 <template>
   <div style="max-width: 320px">
-    <Bubbles autoplay style="--spinner-color: #4ade80" />
+    <Bubbles autoplay />
   </div>
 </template>
 ```
+
+See the full list of custom properties (`--spinner-bg`, per-game aspect ratios)
+in [web components → Styling](./web-components.md#styling).

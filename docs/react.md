@@ -72,15 +72,47 @@ function Game() {
 
 ## Styling
 
-Style the rendered tag with CSS custom properties (see
-[web components → Styling](./web-components.md#styling)). Size the component by
-constraining its container:
+### Change the color
+
+Color isn't a prop — every game reads the `--spinner-color` CSS custom
+property. Set it **inline** on the component (TypeScript needs the
+`React.CSSProperties` cast to allow a custom property):
+
+```tsx
+<Bubbles autoplay style={{ '--spinner-color': '#4ade80' } as React.CSSProperties} />
+```
+
+…or in a **stylesheet**, which recolors every instance and avoids the cast:
+
+```css
+/* the components render the underlying custom-element tags */
+spinner-bubbles {
+  --spinner-color: #4ade80; /* green */
+}
+```
+
+Because it's a CSS custom property it **cascades**, so setting it once on any
+ancestor themes everything inside:
+
+```tsx
+<div style={{ '--spinner-color': '#e879f9' } as React.CSSProperties}>
+  <Pong autoplay />
+  <Bubbles autoplay />
+</div>
+```
+
+### Size
+
+Each game fills its container, so size it by constraining the parent:
 
 ```tsx
 <div style={{ maxWidth: 320 }}>
-  <Bubbles autoplay style={{ '--spinner-color': '#4ade80' } as React.CSSProperties} />
+  <Bubbles autoplay />
 </div>
 ```
+
+See the full list of custom properties (`--spinner-bg`, per-game aspect ratios)
+in [web components → Styling](./web-components.md#styling).
 
 > Note: none of the games dispatch custom events yet, so there are no event
 > props. They can be added to the wrappers if a game starts emitting events.

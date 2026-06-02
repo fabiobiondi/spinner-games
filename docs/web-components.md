@@ -89,6 +89,35 @@ authoritative table. In brief:
 
 ## Styling
 
+### Change the color
+
+Color isn't an attribute or property — every game reads the `--spinner-color`
+CSS custom property. Set it **inline** on the tag:
+
+```html
+<spinner-pong autoplay style="--spinner-color: #4ade80"></spinner-pong>
+```
+
+…or in a **stylesheet**, which recolors every instance on the page:
+
+```css
+spinner-pong {
+  --spinner-color: #4ade80; /* green */
+}
+```
+
+Because it's a CSS custom property it **cascades**, so setting it once on any
+ancestor themes everything inside:
+
+```html
+<div style="--spinner-color: #e879f9">
+  <spinner-pong autoplay></spinner-pong>
+  <spinner-bubbles autoplay></spinner-bubbles>
+</div>
+```
+
+### Size
+
 Each game fills its parent's width and derives its height from an aspect-ratio
 token, so size it by sizing (or constraining) its container:
 
@@ -98,7 +127,7 @@ token, so size it by sizing (or constraining) its container:
 </div>
 ```
 
-CSS custom properties:
+### All custom properties
 
 | Property                   | Default  | What it sets                                  |
 | -------------------------- | -------- | --------------------------------------------- |

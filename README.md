@@ -1,5 +1,7 @@
 # spinner-games
 
+![spinner-games preview — Pong, Breakout, Bubbles and Flappy mini-games](docs/screenshot.png)
+
 Tiny, playable **web-component games** you can drop in as loaders/spinners
 instead of the classic spinning circle. Built with [Lit](https://lit.dev) +
 TypeScript + Vite, shippable as a standalone library.
