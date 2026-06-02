@@ -47,6 +47,7 @@
     "build:core": "tsc && vite build",
     "build:wrappers": "tsc -p tsconfig.wrappers.json --noEmit && vite build --config vite.config.wrappers.ts",
     "build:angular": "ng-packagr -p wrappers/angular/ng-package.json -c wrappers/angular/tsconfig.lib.json",
+    "build:site": "vite build --config vite.config.site.ts",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.wrappers.json --noEmit"
   },

@@ -1,6 +1,7 @@
 # Dependencies & build output
 node_modules/
 dist/
+dist-site/
 
 # Editor / OS
 .DS_Store
