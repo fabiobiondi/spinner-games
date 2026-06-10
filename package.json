@@ -1,6 +1,6 @@
 {
   "name": "spinner-games",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Tiny playable web-component games to use as loaders/spinners instead of the classic one.",
   "type": "module",
   "license": "MIT",
