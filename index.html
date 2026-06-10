@@ -1246,7 +1246,8 @@
 
     <!-- Hero wordmark: the accent dot orbits the "I", follows the cursor while
          hovering the wordmark, and eases back into orbit on leave. Smoothing via
-         a per-frame lerp. Respects prefers-reduced-motion (static dot, no loop). -->
+         a per-frame lerp. Respects prefers-reduced-motion (static dot, no loop),
+         reacting live if the user toggles the OS setting. -->
     <script>
       (function () {
         var wm = document.querySelector('.hero-wordmark .wm');
@@ -1254,7 +1255,13 @@
         var slot = wm && wm.querySelector('.wm-islot');
         if (!wm || !dot || !slot) return;
 
-        function metrics() {
+        // Tunables.
+        var ORBIT_SPEED = 2.0;    // radians per second
+        var ORBIT_RADIUS = 0.58;  // orbit radius as a fraction of font-size
+        var LERP = 0.16;          // per-frame smoothing weight (toward target)
+        var IDOT_OFFSET = 0.55;   // static i-dot offset above centre (× font-size)
+
+        function readMetrics() {
           var w = wm.getBoundingClientRect();
           var s = slot.getBoundingClientRect();
           return {
@@ -1268,15 +1275,12 @@
           dot.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
         }
 
-        // Reduced motion: place the dot statically above the bar (like an i-dot).
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          var m0 = metrics();
-          place(m0.cx, m0.cy - m0.fs * 0.55);
-          dot.style.visibility = 'visible';
-          return;
-        }
+        // Geometry only changes on resize / font reflow, so cache it out of the
+        // animation loop instead of measuring every frame; refresh on resize.
+        var m = readMetrics();
+        window.addEventListener('resize', function () { m = readMetrics(); });
 
-        var hovering = false, mx = 0, my = 0, px = 0, py = 0, started = false;
+        var hovering = false, mx = 0, my = 0, px = 0, py = 0, started = false, running = false;
 
         wm.addEventListener('pointerenter', function () { hovering = true; });
         wm.addEventListener('pointerleave', function () { hovering = false; });
@@ -1287,14 +1291,17 @@
         });
 
         function frame(now) {
-          var m = metrics();
+          if (!running) return;
+          // Skip work while backgrounded; keeps the orbit phase from lurching
+          // forward on tab restore (rAF is throttled but `now` still advances).
+          if (document.hidden) { requestAnimationFrame(frame); return; }
           var tx, ty;
           if (hovering) {
             tx = mx;
             ty = my;
           } else {
-            var a = now / 1000 * 2.0;     // orbit speed (rad/s)
-            var r = m.fs * 0.58;          // orbit radius
+            var a = now / 1000 * ORBIT_SPEED;
+            var r = m.fs * ORBIT_RADIUS;
             tx = m.cx + Math.cos(a) * r;
             ty = m.cy + Math.sin(a) * r;
           }
@@ -1304,12 +1311,36 @@
             started = true;
             dot.style.visibility = 'visible';
           }
-          px += (tx - px) * 0.16;          // smoothing (lerp)
-          py += (ty - py) * 0.16;
+          px += (tx - px) * LERP;
+          py += (ty - py) * LERP;
           place(px, py);
           requestAnimationFrame(frame);
         }
-        requestAnimationFrame(frame);
+
+        function startOrbit() {
+          if (running) return;
+          running = true;
+          started = false;
+          requestAnimationFrame(frame);
+        }
+
+        function parkStatic() {
+          running = false;
+          m = readMetrics();
+          place(m.cx, m.cy - m.fs * IDOT_OFFSET);
+          dot.style.visibility = 'visible';
+        }
+
+        // Honour reduced-motion, and react if the user flips the OS setting
+        // while the page is open.
+        var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+        function applyMotionPref() {
+          if (mq.matches) parkStatic();
+          else startOrbit();
+        }
+        if (mq.addEventListener) mq.addEventListener('change', applyMotionPref);
+        else if (mq.addListener) mq.addListener(applyMotionPref); // older Safari
+        applyMotionPref();
       })();
     </script>
   </body>
