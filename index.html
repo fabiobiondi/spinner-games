@@ -1243,5 +1243,74 @@
         applyThemingColor(themingCustom.value, 'custom')
       )
     </script>
+
+    <!-- Hero wordmark: the accent dot orbits the "I", follows the cursor while
+         hovering the wordmark, and eases back into orbit on leave. Smoothing via
+         a per-frame lerp. Respects prefers-reduced-motion (static dot, no loop). -->
+    <script>
+      (function () {
+        var wm = document.querySelector('.hero-wordmark .wm');
+        var dot = document.getElementById('hero-wm-dot');
+        var slot = wm && wm.querySelector('.wm-islot');
+        if (!wm || !dot || !slot) return;
+
+        function metrics() {
+          var w = wm.getBoundingClientRect();
+          var s = slot.getBoundingClientRect();
+          return {
+            cx: s.left - w.left + s.width / 2,
+            cy: s.top - w.top + s.height / 2,
+            fs: parseFloat(getComputedStyle(wm).fontSize) || 32
+          };
+        }
+
+        function place(x, y) {
+          dot.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+        }
+
+        // Reduced motion: place the dot statically above the bar (like an i-dot).
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          var m0 = metrics();
+          place(m0.cx, m0.cy - m0.fs * 0.55);
+          dot.style.visibility = 'visible';
+          return;
+        }
+
+        var hovering = false, mx = 0, my = 0, px = 0, py = 0, started = false;
+
+        wm.addEventListener('pointerenter', function () { hovering = true; });
+        wm.addEventListener('pointerleave', function () { hovering = false; });
+        wm.addEventListener('pointermove', function (e) {
+          var w = wm.getBoundingClientRect();
+          mx = e.clientX - w.left;
+          my = e.clientY - w.top;
+        });
+
+        function frame(now) {
+          var m = metrics();
+          var tx, ty;
+          if (hovering) {
+            tx = mx;
+            ty = my;
+          } else {
+            var a = now / 1000 * 2.0;     // orbit speed (rad/s)
+            var r = m.fs * 0.58;          // orbit radius
+            tx = m.cx + Math.cos(a) * r;
+            ty = m.cy + Math.sin(a) * r;
+          }
+          if (!started) {
+            px = tx;
+            py = ty;
+            started = true;
+            dot.style.visibility = 'visible';
+          }
+          px += (tx - px) * 0.16;          // smoothing (lerp)
+          py += (ty - py) * 0.16;
+          place(px, py);
+          requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      })();
+    </script>
   </body>
 </html>
