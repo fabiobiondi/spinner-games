@@ -268,7 +268,10 @@ export class SpinnerBreakout extends SpinnerGame {
     }
     this.paddleCenter = clamp(this.paddleCenter, halfW, 1 - halfW)
 
-    // Move ball.
+    // Move ball. Remember where it started this frame so the brick collision
+    // can tell which face it crossed (see collideBricks).
+    const prevX = this.ballX
+    const prevY = this.ballY
     this.ballX += this.ballVX * dt
     this.ballY += this.ballVY * dt
 
@@ -306,7 +309,7 @@ export class SpinnerBreakout extends SpinnerGame {
     }
 
     // Brick collisions.
-    this.collideBricks(rx, ry)
+    this.collideBricks(rx, ry, prevX, prevY)
 
     // Wall cleared.
     if (this.bricks.every((b) => !b)) {
@@ -348,8 +351,18 @@ export class SpinnerBreakout extends SpinnerGame {
     this.ballVY = -this.ballSpeedY
   }
 
-  /** Knock out the first brick the ball overlaps and reflect off it. */
-  private collideBricks(rx: number, ry: number) {
+  /**
+   * Knock out the first brick the ball overlaps and reflect off it.
+   *
+   * `prevX`/`prevY` are the ball's centre at the start of the frame. They are
+   * what keeps a single contact from chewing through several bricks: rather than
+   * inverting whichever axis has the smaller raw overlap (which flips the wrong
+   * way once the ball is sitting deep inside the wall), we reflect on the axis
+   * the ball actually *crossed* this frame and then snap it back out of the
+   * brick, into the empty gap. At these speeds the ball travels far less than a
+   * brick per frame, so it never tunnels and the crossed axis is unambiguous.
+   */
+  private collideBricks(rx: number, ry: number, prevX: number, prevY: number) {
     const brickW =
       (1 - this.brickGapX * (this.cols + 1)) / this.cols
 
@@ -365,22 +378,50 @@ export class SpinnerBreakout extends SpinnerGame {
         const bx = this.brickGapX + col * (brickW + this.brickGapX)
         if (this.ballX + rx < bx || this.ballX - rx > bx + brickW) continue
 
-        // Hit: remove the brick, throw off a little burst from its centre, and
-        // reflect on the shallower axis of overlap.
+        // Hit: remove the brick and throw off a little burst from its centre.
         this.bricks[i] = false
         this.spawnBurst(bx + brickW / 2, by + this.brickH / 2)
-        const overlapX = Math.min(
-          this.ballX + rx - bx,
-          bx + brickW - (this.ballX - rx),
-        )
-        const overlapY = Math.min(
-          this.ballY + ry - by,
-          by + this.brickH - (this.ballY - ry),
-        )
-        if (overlapX < overlapY) {
-          this.ballVX = -this.ballVX
+
+        // Which face did we come through this frame? If the ball was clear of
+        // the brick on exactly one axis last frame, that's the axis it crossed.
+        const crossedX = prevX + rx <= bx || prevX - rx >= bx + brickW
+        const crossedY = prevY + ry <= by || prevY - ry >= by + this.brickH
+
+        let reflectX: boolean
+        if (crossedX && !crossedY) reflectX = true
+        else if (crossedY && !crossedX) reflectX = false
+        else {
+          // Corner hit (or, defensively, an already-overlapping ball): fall back
+          // to the shallower overlap axis.
+          const overlapX = Math.min(
+            this.ballX + rx - bx,
+            bx + brickW - (this.ballX - rx),
+          )
+          const overlapY = Math.min(
+            this.ballY + ry - by,
+            by + this.brickH - (this.ballY - ry),
+          )
+          reflectX = overlapX < overlapY
+        }
+
+        // Reflect away from the nearer face and snap the ball just outside it
+        // (into the gap) so it can't re-enter and nibble the next brick.
+        if (reflectX) {
+          if (this.ballX < bx + brickW / 2) {
+            this.ballVX = -Math.abs(this.ballVX)
+            this.ballX = bx - rx
+          } else {
+            this.ballVX = Math.abs(this.ballVX)
+            this.ballX = bx + brickW + rx
+          }
         } else {
-          this.ballVY = -this.ballVY
+          if (this.ballY < by + this.brickH / 2) {
+            this.ballVY = -Math.abs(this.ballVY)
+            this.ballY = by - ry
+          } else {
+            this.ballVY = Math.abs(this.ballVY)
+            this.ballY = by + this.brickH + ry
+          }
         }
         return // one brick per frame keeps the bounce clean
       }
