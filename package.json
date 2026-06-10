@@ -64,6 +64,7 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run clean && npm run typecheck && npm run build",
     "publish:dry": "npm publish --dry-run",
+    "publish:live": "npm publish",
     "release:patch": "npm version patch && npm publish && git push --follow-tags",
     "release:minor": "npm version minor && npm publish && git push --follow-tags",
     "release:major": "npm version major && npm publish && git push --follow-tags"
