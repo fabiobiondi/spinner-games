@@ -508,9 +508,19 @@
       }
       .api-title {
         margin: 0;
-        font-size: 1.1rem;
-        font-weight: 600;
-        letter-spacing: 0.05em;
+        font-size: clamp(2rem, 6vw, 3.4rem);
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        background: linear-gradient(
+          135deg,
+          var(--page-fg),
+          var(--hero-accent, #2caac3)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
       }
       .api-sub {
         margin: 0.4rem 0 1.5rem;
@@ -976,7 +986,7 @@
       <!-- API explorer: pick a game + framework, tweak props, copy the snippet.
            Tabs, controls and code are built in /playground/api-explorer.js. -->
       <section class="api-explorer" id="api-explorer">
-        <h2 class="api-title">Use it anywhere</h2>
+        <h2 class="api-title">Documentation</h2>
         <p class="api-sub">
           Pick a game and your framework, tweak the props, and copy the snippet.
         </p>
