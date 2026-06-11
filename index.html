@@ -316,6 +316,20 @@
         text-transform: uppercase;
         opacity: 0.7;
       }
+      /* Per-game controls (e.g. Pong's CPU-skill slider) must stay inside the
+         card at every size — the card has `overflow: hidden`, so a row wider
+         than the card would be clipped (the slider became ungrabbable on the
+         smaller card sizes). Cap the row to the card, let it wrap, and let the
+         native range (fixed ~129px intrinsic width) shrink with the card. */
+      .game-card .control {
+        max-width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .game-card .control input[type='range'] {
+        flex: 1 1 6rem;
+        min-width: 3rem;
+      }
       .control span {
         font-variant-numeric: tabular-nums;
         min-width: 2.5em;
@@ -815,13 +829,6 @@
         font-size: 0.9rem;
         font-weight: 600;
         color: var(--page-fg);
-        transition: transform 0.12s ease, background 0.15s ease,
-          border-color 0.15s ease;
-      }
-      .framework-chip:hover {
-        transform: translateY(-2px);
-        background: color-mix(in srgb, var(--brand) 18%, transparent);
-        border-color: color-mix(in srgb, var(--brand) 55%, var(--page-border-strong));
       }
       /* Setting both color and fill covers every icon set: Fa paths use
          fill="currentColor" (driven by color), while Si/Io paths have no
