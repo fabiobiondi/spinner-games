@@ -237,8 +237,11 @@
       .games-grid {
         --spinner-color: #2caac3;
         margin: 2rem auto 0;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        /* Flexbox (not grid) so the 5 demos wrap onto 2 rows and the trailing
+           row stays horizontally centered instead of left-aligned. */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 2rem;
         width: min(95vw, 1100px);
       }
@@ -271,19 +274,9 @@
       .game-card spinner-plinko {
         width: 100%;
       }
-      /* Smaller card sizes pack 4 across; only above the mobile breakpoint so
-         very narrow viewports still collapse to a single column below. */
-      @media (min-width: 541px) {
-        .games-grid[data-size='xsmall'],
-        .games-grid[data-size='small'] {
-          grid-template-columns: repeat(4, 1fr);
-        }
-      }
-      @media (max-width: 540px) {
-        .games-grid {
-          grid-template-columns: 1fr;
-        }
-      }
+      /* With flexbox the demos wrap based on their (size-driven) width, so the
+         per-size column rules are no longer needed — the flow centers itself
+         and collapses to a single column on narrow viewports automatically. */
       .stage h1 {
         font-weight: 500;
         opacity: 0.6;
@@ -975,10 +968,6 @@
           <spinner-breakout></spinner-breakout>
         </div>
         <div class="game-card">
-          <h2>Bubbles</h2>
-          <spinner-bubbles showNewLine="15"></spinner-bubbles>
-        </div>
-        <div class="game-card">
           <h2>Flappy</h2>
           <spinner-flappy id="flappy"></spinner-flappy>
           <div class="control">
@@ -988,6 +977,10 @@
               <button type="button" data-value="cave" aria-pressed="false">Cave</button>
             </span>
           </div>
+        </div>
+        <div class="game-card">
+          <h2>Bubbles</h2>
+          <spinner-bubbles showNewLine="15"></spinner-bubbles>
         </div>
         <div class="game-card">
           <h2>Plinko</h2>
