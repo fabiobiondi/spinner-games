@@ -21,6 +21,7 @@ import {
   SpinnerBreakout as SpinnerBreakoutElement,
   SpinnerBubbles as SpinnerBubblesElement,
   SpinnerFlappy as SpinnerFlappyElement,
+  SpinnerPlinko as SpinnerPlinkoElement,
 } from 'spinner-games'
 
 // None of the games dispatch custom events yet, so `events` is empty for all of
@@ -55,10 +56,18 @@ export const Flappy = createComponent({
   elementClass: SpinnerFlappyElement,
 })
 
+/** React wrapper for `<spinner-plinko>`. */
+export const Plinko = createComponent({
+  react: React,
+  tagName: 'spinner-plinko',
+  elementClass: SpinnerPlinkoElement,
+})
+
 // Re-export the element classes too, for refs and instanceof checks.
 export {
   SpinnerPongElement,
   SpinnerBreakoutElement,
   SpinnerBubblesElement,
   SpinnerFlappyElement,
+  SpinnerPlinkoElement,
 }

@@ -11,5 +11,6 @@ export {
   SpinnerBreakout,
   SpinnerBubbles,
   SpinnerFlappy,
+  SpinnerPlinko,
   SPINNER_GAMES_DIRECTIVES,
 } from './spinner-games.directives'

@@ -13,8 +13,8 @@ TypeScript + Vite, shippable as a standalone library.
 ## Status
 
 Playable mini-games (`<spinner-pong>`, `<spinner-breakout>`,
-`<spinner-bubbles>`, `<spinner-flappy>`) are in place, usable as interactive
-loaders or self-running demos.
+`<spinner-bubbles>`, `<spinner-flappy>`, `<spinner-plinko>`) are in place, usable
+as interactive loaders or self-running demos.
                 |
 
 # USAGE
@@ -121,7 +121,8 @@ export class LoaderComponent {}
 Every game is responsive (fills its parent, height from a
 `--spinner-*-aspect` ratio) and shares the `--spinner-color` token. These
 opt-in attributes are common to the playable games (`<spinner-pong>`,
-`<spinner-breakout>`, `<spinner-bubbles>`, `<spinner-flappy>`):
+`<spinner-breakout>`, `<spinner-bubbles>`, `<spinner-flappy>`,
+`<spinner-plinko>`):
 
 | Attribute              | Default | What it does                                                                 |
 | ---------------------- | ------- | ---------------------------------------------------------------------------- |
@@ -184,6 +185,20 @@ the playable and `autoplay` modes:
 <spinner-flappy autoplay obstacles="cave"></spinner-flappy>
 ```
 
+`<spinner-plinko>` is a Plinko / Galton board: a ball drops from the top, bounces
+through a staggered grid of pegs and lands in a scoring slot. The default 7-slot
+board subtracts `1 · 10 · 50 · 100 · 50 · 10 · 1` (biggest in the center). You
+start at `startScore` (default 500) and burn it down: aim with the mouse and
+click (or press Space) to drop each ball, and reach 0 within your `balls`
+(default 10) to win — a hit fires a confetti burst; run out of balls first and
+the run is over. Tune it with `rows` (peg rows), `slots` (scoring bins), `balls`
+(drops you get) and `startScore` (where the countdown begins):
+
+```html
+<spinner-plinko rows="10" slots="9" balls="12" start-score="800"></spinner-plinko>
+<spinner-plinko autoplay></spinner-plinko>
+```
+
 
 ## Contributions
 
@@ -223,6 +238,7 @@ src/                          # the core web components (the published `spinner-
     spinner-breakout.ts       # self-playing Arkanoid/Breakout loader
     spinner-bubbles.ts        # self-playing Puzzle Bobble / bubble-shooter loader
     spinner-flappy.ts         # self-playing Flappy Bird loader (a ball for a bird)
+    spinner-plinko.ts         # self-playing Plinko / Galton board loader
 wrappers/                     # framework wrappers — each imports the core as `spinner-games`
   react/index.ts              #   React wrappers (subpath: spinner-games/react)
   vue/index.ts                #   Vue wrappers (subpath: spinner-games/vue)

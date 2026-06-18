@@ -99,6 +99,27 @@ export const Flappy = defineComponent({
   },
 })
 
+/** Vue wrapper for `<spinner-plinko>`. */
+export const Plinko = defineComponent({
+  name: 'SpinnerPlinko',
+  props: {
+    ...baseProps,
+    /** Number of peg rows (clamped 4..14; default 8). */
+    rows: { type: Number, default: undefined },
+    /** Number of scoring slots / peg columns (clamped 4..12; default 7). */
+    slots: { type: Number, default: undefined },
+    /** Balls you get per run to reach zero (default 10). */
+    balls: { type: Number, default: undefined },
+    /** Score you start from and burn down to 0 (default 500). */
+    startScore: { type: Number, default: undefined },
+    /** Keep aiming the drop point with the mouse outside the canvas. */
+    trackOutside: { type: Boolean, default: undefined },
+  },
+  setup(props) {
+    return () => h('spinner-plinko', { ...props })
+  },
+})
+
 // Type the raw custom-element tags for consumers who use them directly in
 // templates (with `isCustomElement` configured) instead of the wrappers above.
 declare module '@vue/runtime-core' {
@@ -107,5 +128,6 @@ declare module '@vue/runtime-core' {
     'spinner-breakout': typeof Breakout
     'spinner-bubbles': typeof Bubbles
     'spinner-flappy': typeof Flappy
+    'spinner-plinko': typeof Plinko
   }
 }

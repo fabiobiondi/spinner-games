@@ -5,7 +5,8 @@
 // custom elements already being registered by `/src/index.ts` (loaded just
 // before this script).
 //
-// What it does: lets you pick a game (Pong / Breakout / Bubbles / Flappy) and a
+// What it does: lets you pick a game (Pong / Breakout / Bubbles / Flappy /
+// Plinko) and a
 // framework (HTML / React / Vue / Angular), toggle each game's real props, and
 // see both a live preview and the matching, copy-ready snippet — syntax
 // highlighted with Shiki. The prop list IS the API reference: each row is named
@@ -76,6 +77,19 @@ const GAMES = {
     component: 'Flappy',
     // Flappy flaps — it has no off-canvas steering, so no `trackOutside`.
     props: [{ key: 'obstacles', kind: 'enum', def: 'walls', options: ['walls', 'cave'], hint: 'What to thread through' }],
+  },
+  plinko: {
+    label: 'Plinko',
+    tag: 'spinner-plinko',
+    element: 'SpinnerPlinko',
+    component: 'Plinko',
+    props: [
+      { key: 'rows', kind: 'number', def: 8, min: 4, max: 14, step: 1, hint: 'Peg rows' },
+      { key: 'slots', kind: 'number', def: 7, min: 4, max: 12, step: 1, hint: 'Scoring bins / peg columns' },
+      { key: 'balls', kind: 'number', def: 10, min: 1, max: 30, step: 1, hint: 'Balls you get to reach 0' },
+      { key: 'startScore', kind: 'number', def: 500, min: 100, max: 2000, step: 100, attr: 'start-score', hint: 'Score to burn down from' },
+      TRACK_OUTSIDE,
+    ],
   },
 }
 

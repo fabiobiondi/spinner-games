@@ -171,6 +171,49 @@ export class SpinnerFlappy {
   }
 }
 
+/** Typed wrapper for `<spinner-plinko>`. */
+@Directive({ selector: 'spinner-plinko', standalone: true })
+export class SpinnerPlinko {
+  /** Demo mode: the game plays itself and user input is disabled. */
+  readonly autoplay = input(undefined, { transform: booleanAttribute })
+
+  /** Keep pointer controls working when the pointer leaves the canvas. */
+  readonly allowOutsideControls = input(undefined, {
+    transform: booleanAttribute,
+  })
+
+  /** Paint the panel background behind the game (on by default). */
+  readonly showBackground = input(undefined, { transform: booleanAttribute })
+
+  /** Number of peg rows (clamped 4..14; default 8). */
+  readonly rows = input(undefined, { transform: numberAttribute })
+
+  /** Number of scoring slots / peg columns (clamped 4..12; default 7). */
+  readonly slots = input(undefined, { transform: numberAttribute })
+
+  /** Balls you get per run to reach zero (default 10). */
+  readonly balls = input(undefined, { transform: numberAttribute })
+
+  /** Score you start from and burn down to 0 (default 500). */
+  readonly startScore = input(undefined, { transform: numberAttribute })
+
+  /** Keep aiming the drop point with the mouse outside the canvas. */
+  readonly trackOutside = input(undefined, { transform: booleanAttribute })
+
+  constructor(private readonly el: ElementRef<HTMLElement>) {
+    effect(() => setProp(this.el, 'autoplay', this.autoplay()))
+    effect(() =>
+      setProp(this.el, 'allowOutsideControls', this.allowOutsideControls()),
+    )
+    effect(() => setProp(this.el, 'showBackground', this.showBackground()))
+    effect(() => setProp(this.el, 'rows', this.rows()))
+    effect(() => setProp(this.el, 'slots', this.slots()))
+    effect(() => setProp(this.el, 'balls', this.balls()))
+    effect(() => setProp(this.el, 'startScore', this.startScore()))
+    effect(() => setProp(this.el, 'trackOutside', this.trackOutside()))
+  }
+}
+
 /**
  * All spinner-games directives, for a one-shot import:
  * ```ts
@@ -182,4 +225,5 @@ export const SPINNER_GAMES_DIRECTIVES = [
   SpinnerBreakout,
   SpinnerBubbles,
   SpinnerFlappy,
+  SpinnerPlinko,
 ] as const

@@ -41,6 +41,7 @@ Each wrapper maps to a tag:
 | `Breakout` | `<spinner-breakout>` |
 | `Bubbles`  | `<spinner-bubbles>`  |
 | `Flappy`   | `<spinner-flappy>`   |
+| `Plinko`   | `<spinner-plinko>`   |
 
 ## Props
 
@@ -53,6 +54,7 @@ be written bare (`autoplay`). Use kebab-case in templates (`:show-new-line`).
 | `Breakout` | `autoplay`, `allowOutsideControls`, `showBackground` (on), `trackOutside`                    |
 | `Bubbles`  | `autoplay`, `allowOutsideControls`, `showBackground` (on), `trackOutside`, `showNewLine` (seconds, 0 = off) |
 | `Flappy`   | `autoplay`, `allowOutsideControls`, `showBackground` (on), `obstacles` (`'walls'` \| `'cave'`) |
+| `Plinko`   | `autoplay`, `allowOutsideControls`, `showBackground` (on), `trackOutside`, `rows` (8), `slots` (7), `balls` (10), `startScore` (500) |
 
 ## Prefer the raw tags?
 

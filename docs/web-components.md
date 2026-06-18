@@ -13,6 +13,7 @@ The tags:
 | `<spinner-breakout>` | `SpinnerBreakout`  |
 | `<spinner-bubbles>`  | `SpinnerBubbles`   |
 | `<spinner-flappy>`   | `SpinnerFlappy`    |
+| `<spinner-plinko>`   | `SpinnerPlinko`    |
 
 ## Install
 
@@ -86,6 +87,7 @@ authoritative table. In brief:
 | `<spinner-breakout>` | `autoplay`, `allowOutsideControls`, `showBackground` (on), `trackOutside`                    |
 | `<spinner-bubbles>`  | `autoplay`, `allowOutsideControls`, `showBackground` (on), `trackOutside`, `showNewLine` (seconds, 0 = off) |
 | `<spinner-flappy>`   | `autoplay`, `allowOutsideControls`, `showBackground` (on), `obstacles` (`walls` \| `cave`)   |
+| `<spinner-plinko>`   | `autoplay`, `allowOutsideControls`, `showBackground` (on), `trackOutside`, `rows` (8), `slots` (7), `balls` (10), `startScore` (500) |
 
 ## Styling
 
@@ -137,6 +139,7 @@ token, so size it by sizing (or constraining) its container:
 | `--spinner-breakout-aspect`| `16 / 10`| `<spinner-breakout>` width/height ratio       |
 | `--spinner-bubbles-aspect` | `4 / 5`  | `<spinner-bubbles>` width/height ratio        |
 | `--spinner-flappy-aspect`  | `16 / 10`| `<spinner-flappy>` width/height ratio         |
+| `--spinner-plinko-aspect`  | `5 / 7`  | `<spinner-plinko>` width/height ratio         |
 
 ```css
 spinner-bubbles {

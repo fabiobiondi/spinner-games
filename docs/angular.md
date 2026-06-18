@@ -67,6 +67,7 @@ Each directive matches a tag:
 | `SpinnerBreakout`  | `<spinner-breakout>` |
 | `SpinnerBubbles`   | `<spinner-bubbles>`  |
 | `SpinnerFlappy`    | `<spinner-flappy>`   |
+| `SpinnerPlinko`    | `<spinner-plinko>`   |
 
 ## Inputs
 
@@ -80,6 +81,7 @@ attribute (`autoplay`) thanks to `booleanAttribute`, and numbers are coerced via
 | `SpinnerBreakout` | `autoplay`, `allowOutsideControls`, `showBackground` (on), `trackOutside`                    |
 | `SpinnerBubbles`  | `autoplay`, `allowOutsideControls`, `showBackground` (on), `trackOutside`, `showNewLine` (seconds, 0 = off) |
 | `SpinnerFlappy`   | `autoplay`, `allowOutsideControls`, `showBackground` (on), `obstacles` (`'walls'` \| `'cave'`) |
+| `SpinnerPlinko`   | `autoplay`, `allowOutsideControls`, `showBackground` (on), `trackOutside`, `rows` (8), `slots` (7), `balls` (10), `startScore` (500) |
 
 ## Styling
 

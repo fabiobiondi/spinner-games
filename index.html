@@ -267,7 +267,8 @@
       .game-card spinner-pong,
       .game-card spinner-breakout,
       .game-card spinner-bubbles,
-      .game-card spinner-flappy {
+      .game-card spinner-flappy,
+      .game-card spinner-plinko {
         width: 100%;
       }
       /* Smaller card sizes pack 4 across; only above the mobile breakpoint so
@@ -988,6 +989,10 @@
             </span>
           </div>
         </div>
+        <div class="game-card">
+          <h2>Plinko</h2>
+          <spinner-plinko id="plinko"></spinner-plinko>
+        </div>
       </div>
 
       <!-- API explorer: pick a game + framework, tweak props, copy the snippet.
@@ -1112,7 +1117,7 @@
       // Global controls (above the grid) — drive all four grid games at once.
       const grid = document.querySelector('.games-grid')
       const gridGames = grid.querySelectorAll(
-        'spinner-pong, spinner-breakout, spinner-bubbles, spinner-flappy'
+        'spinner-pong, spinner-breakout, spinner-bubbles, spinner-flappy, spinner-plinko'
       )
 
       // 1) Color: a single CSS variable on the grid cascades into every game.
