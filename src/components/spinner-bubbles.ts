@@ -39,7 +39,7 @@ const COLS = 8
 const D = 1 / COLS // bubble diameter
 const R = D / 2 // bubble radius
 const ROWH = (D * Math.sqrt(3)) / 2 // hex row vertical pitch
-const INITIAL_ROWS = 4
+const INITIAL_ROWS = 3
 const MAX_ANGLE = 1.3 // aim clamp from vertical (~74°)
 const SHOT_SPEED = 1.25 // width-fraction/s
 const DROP_DURATION = 0.2 // seconds for a freshly-dropped row to slide into place
@@ -330,6 +330,25 @@ export class SpinnerBubbles extends SpinnerGame {
     return present[Math.floor(this.rand() * present.length)]
   }
 
+  /**
+   * Re-sync the launcher to the live board: drop any loaded/on-deck colour that
+   * is no longer present and replace it with one that is.
+   *
+   * `pickColor` only guarantees a valid colour *at the instant it runs*, but
+   * `current`/`next` are loaded ahead of time. When a shot pops the last bubble
+   * of a colour, the bubble already sitting in the launcher can be of that now
+   * absent colour — and a bubble whose colour isn't on the board can never form
+   * a 3+ cluster, so it only piles up and the board becomes unclearable. Calling
+   * this after every board change keeps the queue solvable. No-op on an empty
+   * board (the round is already won).
+   */
+  private syncLauncherColors() {
+    const present = this.distinctColors()
+    if (present.length === 0) return
+    if (!present.includes(this.current)) this.current = this.pickColor()
+    if (!present.includes(this.next)) this.next = this.pickColor()
+  }
+
   private shoot() {
     if (this.flying || this.gameState !== 'playing') return
     this.flying = {
@@ -470,6 +489,10 @@ export class SpinnerBubbles extends SpinnerGame {
     this.flying = null
 
     this.resolve(row, col)
+
+    // The pop may have eliminated a colour the launcher is still holding; refresh
+    // it so the loaded/next bubbles only ever use colours that remain in play.
+    this.syncLauncherColors()
 
     if (this.boardEmpty()) {
       if (this.autoplay) this.resetGrid()
