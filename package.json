@@ -40,7 +40,7 @@
       "import": "./dist/vue/index.js"
     },
     "./angular": {
-      "types": "./dist/angular/index.d.ts",
+      "types": "./dist/angular/types/spinner-games-angular.d.ts",
       "default": "./dist/angular/fesm2022/spinner-games-angular.mjs"
     },
     "./package.json": "./package.json"
@@ -95,17 +95,17 @@
     }
   },
   "devDependencies": {
-    "@angular/common": "^19.2.0",
-    "@angular/compiler": "^19.2.0",
-    "@angular/compiler-cli": "^19.2.0",
-    "@angular/core": "^19.2.0",
+    "@angular/common": "^21.2.0",
+    "@angular/compiler": "^21.2.0",
+    "@angular/compiler-cli": "^21.2.0",
+    "@angular/core": "^21.2.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "ng-packagr": "^19.2.0",
+    "ng-packagr": "^21.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "rxjs": "^7.8.1",
-    "typescript": "~5.8.0",
+    "typescript": "~5.9.0",
     "vite": "^6.0.3",
     "vite-plugin-dts": "^4.3.0",
     "vue": "^3.5.13",

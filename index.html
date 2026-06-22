@@ -835,6 +835,92 @@
         color: var(--brand);
         fill: var(--brand);
       }
+      /* Changelog: closing section that records what's new. Mirrors the
+         .api-explorer pattern (centered column, border-top divider, gradient
+         heading) so it reads as part of the same page rhythm. */
+      .changelog {
+        margin: 3.5rem auto 4rem;
+        width: min(95vw, 1100px);
+        text-align: center;
+        border-top: 1px solid var(--page-border);
+        padding-top: 2.5rem;
+      }
+      .changelog-title {
+        margin: 0;
+        font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        background: linear-gradient(
+          135deg,
+          var(--page-fg),
+          var(--hero-accent, #2caac3)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+      }
+      .changelog-sub {
+        margin: 0.4rem 0 1.75rem;
+        font-size: 0.85rem;
+        opacity: 0.6;
+      }
+      .changelog-list {
+        display: grid;
+        gap: 1rem;
+        max-width: 680px;
+        margin: 0 auto;
+        text-align: left;
+      }
+      .changelog-entry {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.5rem 0.6rem;
+        align-items: baseline;
+        padding: 1.1rem 1.25rem;
+        border: 1px solid var(--page-border);
+        border-radius: 0.75rem;
+        background: rgba(127, 127, 127, 0.08);
+      }
+      .changelog-tag {
+        grid-column: 2;
+        grid-row: 1;
+        justify-self: start;
+        align-self: center;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.28rem 0.6rem;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .changelog-tag--new {
+        color: #0e0e12;
+        background: var(--hero-accent, #2caac3);
+      }
+      .changelog-tag--enhancement {
+        color: var(--page-fg);
+        background: rgba(127, 127, 127, 0.18);
+        border: 1px solid var(--page-border-strong);
+      }
+      .changelog-game {
+        grid-column: 1;
+        grid-row: 1;
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+      .changelog-desc {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        opacity: 0.75;
+      }
     </style>
   </head>
   <body>
@@ -1071,6 +1157,33 @@
         </p>
       </section>
     </div>
+    <!-- Changelog: the running record of what's new, newest first. Keep entries
+         short — tag (NEW GAME / ENHANCEMENT), the game, and a one-line note. -->
+    <section class="changelog" aria-labelledby="changelog-title">
+      <h2 class="changelog-title" id="changelog-title">Changelog</h2>
+      <p class="changelog-sub">What's new in Spinner Games.</p>
+      <div class="changelog-list">
+        <article class="changelog-entry">
+          <span class="changelog-tag changelog-tag--new">New game</span>
+          <h3 class="changelog-game">Plinko</h3>
+          <p class="changelog-desc">
+            A minimal Plinko / Galton board: aim the drop point and release a
+            ball that bounces down through a peg grid into the scoring slots.
+            Bounces are fully deterministic — no randomness — so where it lands
+            depends only on where you drop it.
+          </p>
+        </article>
+        <article class="changelog-entry">
+          <span class="changelog-tag changelog-tag--enhancement">Enhancement</span>
+          <h3 class="changelog-game">Bubbles</h3>
+          <p class="changelog-desc">
+            Simplified the game: removed one starting row of bubbles, and the
+            colors offered to shoot are now drawn only from the colors still
+            visible on the board.
+          </p>
+        </article>
+      </div>
+    </section>
     <script type="module" src="/src/index.ts"></script>
     <script type="module" src="/playground/api-explorer.js"></script>
     <script type="module">

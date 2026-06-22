@@ -92,7 +92,9 @@ export abstract class SpinnerGame extends LitElement {
 
     this.measure()
     this.setupCanvas()
-    this.resetRound()
+    // The round + autoplay state are initialised in `willUpdate` (before the
+    // first render) so they don't schedule a second update from here — see the
+    // change-in-update note there.
 
     this.resizeObserver = new ResizeObserver(() => {
       this.measure()
@@ -103,8 +105,6 @@ export abstract class SpinnerGame extends LitElement {
     this.bindPointer()
     this.addEventListener('keydown', this.boundKeyDown)
     this.addEventListener('keyup', this.boundKeyUp)
-
-    if (this.autoplay) this.gameState = 'playing'
 
     this.lastTime = performance.now()
     this.rafId = requestAnimationFrame(this.loop)
@@ -128,31 +128,38 @@ export abstract class SpinnerGame extends LitElement {
     if (changed.has('gameState')) {
       this.toggleAttribute('game-over', this.over)
     }
+
+    // Initialise the round (and start the demo in autoplay) before the first
+    // render, and react to `autoplay` flipping at runtime — both here in
+    // `willUpdate` rather than `firstUpdated`/`updated`. Those run *after* the
+    // render, so the reactive state they set (`gameState`, plus whatever
+    // `resetRound` touches) would schedule a second update and trip Lit's
+    // change-in-update warning. Setting it here folds the change into the update
+    // that's already in flight. `resetRound` only needs the measured size (never
+    // the canvas), so a `measure()` first is enough for the pre-render case.
+    if (!this.hasUpdated) {
+      this.measure()
+      this.resetRound()
+      if (this.autoplay) this.gameState = 'playing'
+    } else if (changed.has('autoplay') && changed.get('autoplay') !== undefined) {
+      // Genuine runtime toggle: turning it on starts a fresh demo round, turning
+      // it off drops the game back to its idle "Play" state.
+      this.resetRound()
+      this.gameState = this.autoplay ? 'playing' : 'idle'
+    }
   }
 
   override updated(changed: PropertyValues) {
     // Re-target the pointer listeners when an outside-control flips at runtime.
     // `trackOutside` only exists on the games that declare it; the check is a
-    // harmless no-op for those (like flappy) that don't.
+    // harmless no-op for those (like flappy) that don't. This is plain DOM work
+    // (no reactive state), so it stays here where the canvas is guaranteed.
     if (
       (changed.has('trackOutside') || changed.has('allowOutsideControls')) &&
       this.canvas
     ) {
       this.unbindPointer()
       this.bindPointer()
-    }
-
-    // React to `autoplay` flipping at runtime. The very first update is handled
-    // by `firstUpdated` (old value is undefined), so we only act on a genuine
-    // toggle: turning it on starts a fresh demo round, turning it off drops the
-    // game back to its idle "Play" state.
-    if (
-      changed.has('autoplay') &&
-      changed.get('autoplay') !== undefined &&
-      this.canvas
-    ) {
-      this.resetRound()
-      this.gameState = this.autoplay ? 'playing' : 'idle'
     }
   }
 
